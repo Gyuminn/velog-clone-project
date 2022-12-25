@@ -3,13 +3,9 @@ import cors from "cors";
 // import {sequelize} from "./modes";
 import router from "./routes";
 import path from "path";
+import sequelize from "./models";
 
 const app = express();
-
-// 시퀄라이즈 부분
-// sequelize.sync({force: false}).catch((error) => {
-//   console.error(error);
-// })
 
 // Port Host
 const PORT: number = parseInt(process.env.PORT as string, 10) || 3001;
@@ -52,15 +48,14 @@ const server = app
     );
 
     // 시퀄라이즈 연결 부
-    // sequelize
-    //   .sync({ alter: true })
-    //   .authenticate()
-    //   .then(async () => {
-    //     console.log("mariaDB Connected ...");
-    //   })
-    //   .catch((err) => {
-    //     console.log("TT : ", err);
-    //   });
+    sequelize
+      .authenticate()
+      .then(async () => {
+        console.log("mariaDB Connected SUCCESS");
+      })
+      .catch((err) => {
+        console.log("mariaDB Connected Fail: ", err);
+      });
   })
   .on("error", (err) => {
     console.log(err);
