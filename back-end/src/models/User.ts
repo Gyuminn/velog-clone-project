@@ -1,9 +1,6 @@
 import {
   Model,
   Column,
-  CreatedAt,
-  UpdatedAt,
-  DeletedAt,
   Table,
   PrimaryKey,
   AutoIncrement,
@@ -11,7 +8,9 @@ import {
   Default,
   AllowNull,
   DataType,
+  HasMany,
 } from "sequelize-typescript";
+import Board from "./Board";
 
 @Table({
   modelName: "User",
@@ -30,32 +29,32 @@ export default class User extends Model {
   public user_id!: number;
 
   @Unique
-  @AllowNull
   @Column(DataType.STRING(40))
   public email!: string;
 
   @Unique
+  @AllowNull(false)
   @Column(DataType.CHAR(40))
   public nickname!: string;
 
-  @AllowNull
   @Column(DataType.CHAR(128))
   public password!: string;
 
-  @AllowNull
   @Column(DataType.CHAR(200))
   public introSummary!: string;
 
-  @AllowNull
   @Column(DataType.STRING(1000))
   public introContent!: string;
 
-  @AllowNull
   @Default("empty.jpg")
   @Column(DataType.CHAR(200))
   public profileImageUrl!: string;
 
   @Default("local")
+  @AllowNull(false)
   @Column(DataType.STRING(10))
   public provider!: string;
+
+  @HasMany(() => Board)
+  boards: Board[];
 }
