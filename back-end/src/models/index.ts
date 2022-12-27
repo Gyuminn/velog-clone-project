@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import User from "./User";
 import Board from "./Board";
 import Comment from "./Comment";
+import File from "./File";
 
 dotenv.config();
 
@@ -15,7 +16,7 @@ export const sequelize = new Sequelize({
   dialect: "mysql",
 });
 
-sequelize.addModels([User, Board, Comment]);
+sequelize.addModels([User, Board, Comment, File]);
 
-export { User, Board, Comment };
+export { User, Board, Comment, File };
 export default sequelize;

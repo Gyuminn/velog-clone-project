@@ -13,6 +13,7 @@ import {
   HasMany,
 } from "sequelize-typescript";
 import Comment from "./Comment";
+import File from "./File";
 import User from "./User";
 
 @Table({
@@ -55,4 +56,7 @@ export default class Board extends Model {
 
   @HasMany(() => Comment)
   comments: Comment[];
+
+  @HasMany(() => File)
+  files: File[];
 }
