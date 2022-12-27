@@ -1,4 +1,4 @@
-import express from "express";
+import express, { urlencoded } from "express";
 import cors from "cors";
 import router from "./routes";
 import path from "path";
@@ -8,8 +8,6 @@ const app = express();
 
 // Port Host
 const PORT: number = parseInt(process.env.PORT as string, 10) || 3001;
-
-const HOST: string = process.env.HOST || "localhost";
 
 // allow cors
 app.use(
@@ -22,20 +20,29 @@ app.use(
   })
 );
 
+let bodyParser = require("body-parser");
+app.use(bodyParser.json());
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
+
 // route
 app.use("/", router);
 
-// error handler
-app.use(function (err, req, res, next) {
+// 에러 발생시 처리
+app.use((err, req, res, next) => {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "production" ? err : {};
 
   // render the error page
-  res.stats(err.stats || 500);
+  res.status(err.stats || 500);
   res.render("error");
 });
 
+// 서버 구동
 const server = app
   .listen(PORT, () => {
     console.log(

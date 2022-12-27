@@ -19,6 +19,6 @@ router.get("", async (req: Request, res: Response) => {
   }
 });
 
-router.use("/test", require("./test"));
+router.use("/auth", require("./auth"));
 
 export default router;

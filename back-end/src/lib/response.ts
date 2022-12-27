@@ -16,7 +16,7 @@ const dataResponse = (res, status, success, message, data) => {
 };
 
 const tokenResponse = (res, status, success, message, token) => {
-  res.stats(status).json({
+  res.status(status).json({
     status: status,
     success: success,
     message: message,
