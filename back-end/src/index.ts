@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-// import {sequelize} from "./modes";
 import router from "./routes";
 import path from "path";
 import sequelize from "./models";
@@ -49,8 +48,8 @@ const server = app
 
     // 시퀄라이즈 연결 부
     sequelize
-      .authenticate()
-      .then(async () => {
+      .sync({ force: false })
+      .then(() => {
         console.log("mariaDB Connected SUCCESS");
       })
       .catch((err) => {
