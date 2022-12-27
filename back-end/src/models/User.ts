@@ -11,6 +11,8 @@ import {
   HasMany,
 } from "sequelize-typescript";
 import Board from "./Board";
+import Comment from "./Comment";
+import Tag from "./Tag";
 
 @Table({
   modelName: "User",
@@ -57,4 +59,10 @@ export default class User extends Model {
 
   @HasMany(() => Board)
   boards: Board[];
+
+  @HasMany(() => Comment)
+  comments: Comment[];
+
+  @HasMany(() => Tag)
+  tags: Tag[];
 }
