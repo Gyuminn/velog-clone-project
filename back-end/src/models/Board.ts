@@ -35,6 +35,7 @@ export default class Board extends Model {
   public board_id!: number;
 
   @ForeignKey(() => User)
+  @AllowNull(false)
   @Column
   public user_id!: number;
 

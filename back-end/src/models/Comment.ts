@@ -31,10 +31,12 @@ export default class Comment extends Model {
   public comment_id!: number;
 
   @ForeignKey(() => Board)
+  @AllowNull(false)
   @Column
   public board_id!: number;
 
   @ForeignKey(() => User)
+  @AllowNull(false)
   @Column
   public user_id!: number;
 

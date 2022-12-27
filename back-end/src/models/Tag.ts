@@ -8,6 +8,7 @@ import {
   DataType,
   ForeignKey,
   BelongsTo,
+  AllowNull,
 } from "sequelize-typescript";
 import Board from "./Board";
 import User from "./User";
@@ -29,10 +30,12 @@ export default class Tag extends Model {
   public tag_id!: number;
 
   @ForeignKey(() => Board)
+  @AllowNull(false)
   @Column
   public board_id!: number;
 
   @ForeignKey(() => User)
+  @AllowNull(false)
   @Column
   public user_id!: number;
 

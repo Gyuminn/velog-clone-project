@@ -8,6 +8,7 @@ import {
   DataType,
   ForeignKey,
   BelongsTo,
+  AllowNull,
 } from "sequelize-typescript";
 import Board from "./Board";
 
@@ -28,6 +29,7 @@ export default class File extends Model {
   public file_id!: number;
 
   @ForeignKey(() => Board)
+  @AllowNull(false)
   @Column
   public board_id!: number;
 
