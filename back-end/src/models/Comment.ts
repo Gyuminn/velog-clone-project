@@ -10,49 +10,52 @@ import {
   DataType,
   ForeignKey,
   BelongsTo,
-  HasMany,
 } from "sequelize-typescript";
-import Comment from "./Comment";
+import Board from "./Board";
 import User from "./User";
 
 @Table({
-  modelName: "Board",
-  tableName: "Board",
+  modelName: "Comment",
+  tableName: "Comment",
   underscored: false,
   timestamps: true,
   paranoid: true,
   charset: "utf8mb4",
   collate: "utf8mb4_general_ci",
 })
-export default class Board extends Model {
+export default class Comment extends Model {
   @PrimaryKey
   @AutoIncrement
   @Unique
   @Column(DataType.INTEGER)
+  public comment_id!: number;
+
+  @ForeignKey(() => Board)
+  @Column
   public board_id!: number;
 
   @ForeignKey(() => User)
   @Column
   public user_id!: number;
 
-  @Column(DataType.STRING(40))
-  public title!: string;
+  @Column(DataType.INTEGER)
+  public parent!: number;
 
+  @AllowNull(false)
+  @Column(DataType.INTEGER)
+  public level!: number;
+
+  @AllowNull(false)
+  @Column(DataType.INTEGER)
+  public root_index!: number;
+
+  @AllowNull(false)
   @Column(DataType.TEXT)
   public content!: string;
-
-  @AllowNull
-  @Column(DataType.CHAR(200))
-  public thumbnailContent!: string;
-
-  @AllowNull
-  @Default("empty.jpg")
-  @Column(DataType.CHAR(200))
-  public thumbnailImageUrl!: string;
 
   @BelongsTo(() => User)
   user: User;
 
-  @HasMany(() => Comment)
-  comments: Comment[];
+  @BelongsTo(() => Board)
+  board: Board;
 }

@@ -2,6 +2,7 @@ import { Sequelize } from "sequelize-typescript";
 import dotenv from "dotenv";
 import User from "./User";
 import Board from "./Board";
+import Comment from "./Comment";
 
 dotenv.config();
 
@@ -14,7 +15,7 @@ export const sequelize = new Sequelize({
   dialect: "mysql",
 });
 
-sequelize.addModels([User, Board]);
+sequelize.addModels([User, Board, Comment]);
 
-export { User, Board };
+export { User, Board, Comment };
 export default sequelize;
