@@ -1,6 +1,8 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import isEmail from "validator/lib/isEmail";
 import config from "../config";
+import { isValidNickname, isValidPassword } from "../lib/checkValidation";
 import constant from "../lib/constant";
 import User from "../models/User";
 
@@ -24,9 +26,33 @@ const postSignupService = async (
   if (!email || !nickname || !password) {
     return constant.NULL_VALUE;
   }
-  /*
-  유효성 검사가 들어가야 할 부분.
-  */
+
+  // email 형식이 잘못되었을 때
+  if (!isEmail(email)) {
+    return constant.WRONG_EMAIL_CONVENTION;
+  }
+
+  // nickname 형식이 잘못되었을 때
+  if (!isValidNickname(nickname)) {
+    return constant.WRONG_NICKNAME_CONVENTION;
+  }
+
+  // password 형식이 잘못되었을 때
+  if (!isValidPassword(password)) {
+    return constant.WRONG_PASSWORD_CONVENTION;
+  }
+
+  // email이 이미 존재할 때
+  let existedUser = await User.findOne({ where: { email } });
+  if (existedUser) {
+    return constant.EMAIL_ALREADY_EXIST;
+  }
+
+  // nickname이 이미 존재할 때
+  existedUser = await User.findOne({ where: { nickname } });
+  if (existedUser) {
+    return constant.NICKNAME_ALREADY_EXIST;
+  }
 
   // 새로운 유저 생성 & 토큰 발급
   const salt = await bcrypt.genSalt(10);
