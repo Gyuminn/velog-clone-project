@@ -7,6 +7,42 @@ import constant from "../lib/constant";
 import User from "../models/User";
 
 /**
+ *  @유저_로그인
+ *  @route POST auth/login
+ *  @access public
+ *  @err 1. 필요한 값이 없을 때
+ *       2. 존재하지 않는 이메일일 때
+ *       3. 비밀번호가 일치하지 않을 때
+ */
+const postLoginService = async (email: string, password: string) => {
+  // 필요한 값이 없을 때
+  if (!email || !password) {
+    return constant.NULL_VALUE;
+  }
+
+  // 존재하지 않는 이메일일 때
+  const user = await User.findOne({ where: { email } });
+  if (!user) {
+    return constant.EMAIL_NOT_FOUND;
+  }
+
+  // 비밀번호가 일치하지 않을 떄
+  const isCorrect = await bcrypt.compare(password, user.password);
+  if (!isCorrect) {
+    return constant.PW_NOT_CORRECT;
+  }
+
+  // 로그인에 성공했을 경우 토큰 발급
+  const payload = {
+    email: user.email,
+    nickname: user.nickname,
+  };
+
+  const token = jwt.sign(payload, config.jwtSecret, { expiresIn: "14d" });
+  return { email: user.email, nickname: user.nickname, token };
+};
+
+/**
  *  @회원가입
  *  @route POST /auth/signup
  *  @access public
@@ -64,7 +100,7 @@ const postSignupService = async (
   });
 
   const payload = {
-    id: newUser.email,
+    email: newUser.email,
     nickname: newUser.nickname,
   };
 
@@ -76,6 +112,7 @@ const postSignupService = async (
 
 const authService = {
   postSignupService,
+  postLoginService,
 };
 
 export default authService;

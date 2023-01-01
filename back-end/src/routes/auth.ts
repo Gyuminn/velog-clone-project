@@ -8,6 +8,7 @@ import authoController from "../controller/auth";
 
 const router = express.Router();
 
+router.post("/login", authoController.postLoginController);
 router.post("/signup", authoController.postSignupController);
 
 module.exports = router;
