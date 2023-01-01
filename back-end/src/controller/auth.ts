@@ -62,7 +62,7 @@ const postLoginController = async (req: Request, res: Response) => {
       res,
       returnCode.INTERNAL_SERVER_ERROR,
       false,
-      "서버 오류"
+      `서버 오류: ${err.message}`
     );
   }
 };
@@ -157,9 +157,39 @@ const postSignupController = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ *  @로그인_여부_검사
+ *  @route GET auth/check
+ *  @access public
+ *  @err
+ */
+const getIsLoginController = async (req: Request, res: Response) => {
+  try {
+    const resData = await authService.getIsLoginService(
+      req.user ? true : false
+    );
+
+    return response.dataResponse(
+      res,
+      returnCode.OK,
+      true,
+      "로그인 여부 확인 성공",
+      resData
+    );
+  } catch (err) {
+    return response.basicResponse(
+      res,
+      returnCode.INTERNAL_SERVER_ERROR,
+      false,
+      `서버 오류: ${err.message}`
+    );
+  }
+};
+
 const authoController = {
   postSignupController,
   postLoginController,
+  getIsLoginController,
 };
 
 export default authoController;

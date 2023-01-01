@@ -100,8 +100,10 @@ const postSignupService = async (
   });
 
   const payload = {
-    email: newUser.email,
-    nickname: newUser.nickname,
+    user: {
+      email: newUser.email,
+      nickname: newUser.nickname,
+    },
   };
 
   const token = jwt.sign(payload, config.jwtSecret, {
@@ -110,9 +112,20 @@ const postSignupService = async (
   return token;
 };
 
+/**
+ *  @로그인_여부_검사
+ *  @route GET auth/check
+ *  @access public
+ *  @err
+ */
+const getIsLoginService = async (isLogin: boolean) => {
+  return { isLogin };
+};
+
 const authService = {
   postSignupService,
   postLoginService,
+  getIsLoginService,
 };
 
 export default authService;
