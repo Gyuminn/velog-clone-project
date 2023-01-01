@@ -6,6 +6,68 @@ import authService from "../services/auth";
 import constant from "../lib/constant";
 
 /**
+ *  @유저_로그인
+ *  @route POST auth/login
+ *  @access public
+ *  @err 1. 필요한 값이 없을 때
+ *       2. 존재하지 않는 이메일일 때
+ *       3. 비밀번호가 일치하지 않았을 때
+ */
+const postLoginController = async (req: Request, res: Response) => {
+  try {
+    const resData = await authService.postLoginService(
+      req.body.email,
+      req.body.password
+    );
+
+    // 필요한 값이 없을 때
+    if (resData == constant.NULL_VALUE) {
+      return response.basicResponse(
+        res,
+        returnCode.BAD_REQUEST,
+        false,
+        "필요한 값이 없습니다."
+      );
+    }
+
+    // 존재하지 않는 이메일일 때
+    if (resData == constant.EMAIL_NOT_FOUND) {
+      return response.basicResponse(
+        res,
+        returnCode.BAD_REQUEST,
+        false,
+        "존재하지 않는 이메일입니다."
+      );
+    }
+
+    // 비밀번호가 일치하지 않을 때
+    if (resData == constant.PW_NOT_CORRECT) {
+      return response.basicResponse(
+        res,
+        returnCode.BAD_REQUEST,
+        false,
+        "비밀번호가 일치하지 않습니다"
+      );
+    }
+
+    return response.dataResponse(
+      res,
+      returnCode.OK,
+      true,
+      "로그인에 성공하였습니다.",
+      resData
+    );
+  } catch (err) {
+    return response.basicResponse(
+      res,
+      returnCode.INTERNAL_SERVER_ERROR,
+      false,
+      `서버 오류: ${err.message}`
+    );
+  }
+};
+
+/**
  *  @회원가입
  *  @route POST /auth/signup
  *  @access public
@@ -95,8 +157,39 @@ const postSignupController = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ *  @로그인_여부_검사
+ *  @route GET auth/check
+ *  @access public
+ *  @err
+ */
+const getIsLoginController = async (req: Request, res: Response) => {
+  try {
+    const resData = await authService.getIsLoginService(
+      req.user ? true : false
+    );
+
+    return response.dataResponse(
+      res,
+      returnCode.OK,
+      true,
+      "로그인 여부 확인 성공",
+      resData
+    );
+  } catch (err) {
+    return response.basicResponse(
+      res,
+      returnCode.INTERNAL_SERVER_ERROR,
+      false,
+      `서버 오류: ${err.message}`
+    );
+  }
+};
+
 const authoController = {
   postSignupController,
+  postLoginController,
+  getIsLoginController,
 };
 
 export default authoController;
