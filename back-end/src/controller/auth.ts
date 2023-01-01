@@ -3,6 +3,7 @@ import returnCode from "../lib/returnCode";
 import response from "../lib/response";
 
 import authService from "../services/auth";
+import constant from "../lib/constant";
 
 /**
  *  @회원가입
@@ -23,9 +24,59 @@ const postSignupController = async (req: Request, res: Response) => {
       req.body.password
     );
 
-    /**
-     * 유효성 검사가 들어갈 부분
-     */
+    if (token == constant.NULL_VALUE) {
+      return response.basicResponse(
+        res,
+        returnCode.BAD_REQUEST,
+        false,
+        "필요한 값이 존재하지 않습니다."
+      );
+    }
+
+    if (token == constant.WRONG_EMAIL_CONVENTION) {
+      return response.basicResponse(
+        res,
+        returnCode.BAD_REQUEST,
+        false,
+        "올바르지 않은 이메일 형식입니다."
+      );
+    }
+
+    if (token == constant.WRONG_NICKNAME_CONVENTION) {
+      return response.basicResponse(
+        res,
+        returnCode.BAD_REQUEST,
+        false,
+        "올바르지 않은 닉네임 형식입니다."
+      );
+    }
+
+    if (token == constant.WRONG_PASSWORD_CONVENTION) {
+      return response.basicResponse(
+        res,
+        returnCode.BAD_REQUEST,
+        false,
+        "올바르지 않은 비밀번호 형식입니다."
+      );
+    }
+
+    if (token == constant.EMAIL_ALREADY_EXIST) {
+      return response.basicResponse(
+        res,
+        returnCode.BAD_REQUEST,
+        false,
+        "이미 존재하는 이메일 입니다."
+      );
+    }
+
+    if (token == constant.NICKNAME_ALREADY_EXIST) {
+      return response.basicResponse(
+        res,
+        returnCode.BAD_REQUEST,
+        false,
+        "이미 존재하는 닉네입 입니다"
+      );
+    }
 
     return response.tokenResponse(
       res,

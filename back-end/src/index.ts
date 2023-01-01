@@ -20,6 +20,7 @@ app.use(
   })
 );
 
+// POST 방식의 파라미터를 읽을 수 있도록 설정
 let bodyParser = require("body-parser");
 app.use(bodyParser.json());
 app.use(
