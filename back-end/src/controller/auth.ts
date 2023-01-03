@@ -186,10 +186,10 @@ const getIsLoginController = async (req: Request, res: Response) => {
   }
 };
 
-const authoController = {
+const authController = {
   postSignupController,
   postLoginController,
   getIsLoginController,
 };
 
-export default authoController;
+export default authController;

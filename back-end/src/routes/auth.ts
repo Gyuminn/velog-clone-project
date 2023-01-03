@@ -4,12 +4,12 @@ import express from "express";
 import { isLogin } from "../middlewares/authMiddleware";
 
 // Controller
-import authoController from "../controller/auth";
+import authController from "../controller/auth";
 
 const router = express.Router();
 
-router.post("/login", authoController.postLoginController);
-router.post("/signup", authoController.postSignupController);
-router.get("/check", isLogin, authoController.getIsLoginController);
+router.post("/login", authController.postLoginController);
+router.post("/signup", authController.postSignupController);
+router.get("/check", isLogin, authController.getIsLoginController);
 
 module.exports = router;
