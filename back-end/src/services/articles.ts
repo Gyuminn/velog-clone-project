@@ -1,14 +1,15 @@
 import constant from "../lib/constant";
+import { Board, User } from "../models";
 
 /**
  *  @게시글작성 게시글 작성
  *  @route POST user/login
  *  @access public
  *  @err 1. 요청 값이 잘못되었을 경우
- *
+ *       2. 존재하지 않는 유저
  */
 const postArticleService = async (
-  userId: string,
+  email: string,
   title: string,
   /**
    * TODO
@@ -21,7 +22,7 @@ const postArticleService = async (
   tags: string[]
 ) => {
   if (
-    !userId ||
+    !email ||
     title === undefined ||
     title === null ||
     content === undefined ||
@@ -29,6 +30,15 @@ const postArticleService = async (
   ) {
     return constant.NULL_VALUE;
   }
+
+  const user = await User.findOne({ where: { email } });
+
+  if (!user) {
+    return constant.NON_EXISTENT_USER;
+  }
+
+  console.log(`service layer`, user);
+  return { email };
 };
 
 const articlesService = {

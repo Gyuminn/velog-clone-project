@@ -13,6 +13,8 @@ export const uploadThumbnail = () => {
   } catch (err) {
     fs.mkdirSync("public/thumbnail_img");
   }
+
+  // 파일 업로드
   multer({
     storage: multer.diskStorage({
       destination(
