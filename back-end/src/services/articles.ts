@@ -21,6 +21,7 @@ const postArticleService = async (
   thumbnailImageUrl: string,
   tags: string[]
 ) => {
+  // 요청 값이 잘못되었을 경우
   if (
     !email ||
     title === undefined ||
@@ -33,27 +34,67 @@ const postArticleService = async (
 
   const user = await User.findOne({ where: { email } });
 
+  // 존재하지 않는 유저일 경우
   if (!user) {
     return constant.NON_EXISTENT_USER;
   }
 
-  let createdArticleId: string;
   // 게시글 업로드
-  await Board.create({
+  const createdArticle = await Board.create({
     user_id: user.user_id,
     title,
     content,
     thumbnailContent,
     thumbnailImageUrl,
-  }).then((newArticle) => {
-    createdArticleId = newArticle.id;
   });
 
-  return createdArticleId;
+  return { createdArticleId: createdArticle.id };
+};
+
+/**
+ *  @게시글단일조회
+ *  @route GET articles/:articleId
+ *  @access public
+ *  @err 1. 필요한 값이 없을 경우
+ *       2. 존재하지 않는 article일 경우
+ *       3. 게시물 작성자가 존재하지 않는 경우
+ */
+const getOneArticleService = async (articleId: string) => {
+  // 필요한 값이 없을 경우
+  if (!articleId) {
+    return constant.NULL_VALUE;
+  }
+
+  const articleToShow = await Board.findOne({
+    where: { board_id: articleId },
+  });
+
+  // 존재하지 않는 article일 경우
+  if (!articleToShow) {
+    return constant.DB_NOT_FOUND;
+  }
+
+  const userEmailToShow = await User.findOne({
+    attributes: ["email"],
+    where: { user_id: articleToShow.user_id },
+  });
+
+  if (!userEmailToShow) {
+    return constant.NON_EXISTENT_USER;
+  }
+
+  return {
+    userId: userEmailToShow.email,
+    title: articleToShow.title,
+    content: articleToShow.content,
+    // 게시글 단일 조회에서 thumbnailContent는 보여지지 않는다.
+    thumbnailImageUrl: articleToShow.thumbnailImageUrl,
+  };
 };
 
 const articlesService = {
   postArticleService,
+  getOneArticleService,
 };
 
 export default articlesService;
