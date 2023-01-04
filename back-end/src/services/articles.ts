@@ -1,5 +1,5 @@
 import constant from "../lib/constant";
-import { Board, User } from "../models";
+import { Board, Tag, User } from "../models";
 
 /**
  *  @게시글작성 게시글 작성
@@ -37,8 +37,19 @@ const postArticleService = async (
     return constant.NON_EXISTENT_USER;
   }
 
-  console.log(`service layer`, user);
-  return { email };
+  let createdArticleId: string;
+  // 게시글 업로드
+  await Board.create({
+    user_id: user.user_id,
+    title,
+    content,
+    thumbnailContent,
+    thumbnailImageUrl,
+  }).then((newArticle) => {
+    createdArticleId = newArticle.id;
+  });
+
+  return createdArticleId;
 };
 
 const articlesService = {

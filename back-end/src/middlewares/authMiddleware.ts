@@ -35,7 +35,6 @@ export const isLogin = async (req: Request, res: Response, next) => {
     if (!user) return next();
 
     req.user = user;
-    console.log(`req.user를 로그인했을때 확인`, req.user, typeof req.user);
 
     return next();
   } catch (err) {

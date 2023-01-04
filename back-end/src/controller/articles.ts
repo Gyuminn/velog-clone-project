@@ -22,8 +22,32 @@ const postArticleController = async (req: Request, res: Response) => {
       req.body.thumbnailImageUrl,
       req.body.tags
     );
-    console.log(`controller layer`, resData);
-    return;
+
+    if (resData === constant.NULL_VALUE) {
+      return response.basicResponse(
+        res,
+        returnCode.BAD_REQUEST,
+        false,
+        "요청 값이 잘못되었습니다."
+      );
+    }
+
+    if (resData === constant.NON_EXISTENT_USER) {
+      return response.basicResponse(
+        res,
+        returnCode.BAD_REQUEST,
+        false,
+        "존재하지 않는 유저입니다."
+      );
+    }
+
+    return response.dataResponse(
+      res,
+      returnCode.OK,
+      true,
+      "게시글 작성이 완료되었습니다.",
+      resData
+    );
   } catch (err) {
     return response.basicResponse(
       res,
