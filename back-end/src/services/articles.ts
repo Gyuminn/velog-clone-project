@@ -3,7 +3,7 @@ import { Board, Tag, User } from "../models";
 
 /**
  *  @게시글작성 게시글 작성
- *  @route POST user/login
+ *  @route POST articles
  *  @access public
  *  @err 1. 요청 값이 잘못되었을 경우
  *       2. 존재하지 않는 유저
@@ -48,7 +48,17 @@ const postArticleService = async (
     thumbnailImageUrl,
   });
 
-  return { createdArticleId: createdArticle.id };
+  return { createdArticleId: createdArticle.board_id };
+};
+
+/**
+ *  @게시글리스트조회
+ *  @route GET articles
+ *  @access public
+ *  @err
+ */
+const getAllArticlesService = async (sortingMethod: string) => {
+  // 커서 기반 페이지네이션 구현
 };
 
 /**

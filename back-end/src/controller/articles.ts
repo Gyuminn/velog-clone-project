@@ -6,7 +6,7 @@ import returnCode from "../lib/returnCode";
 import constant from "../lib/constant";
 /**
  *  @게시글작성 게시글 작성
- *  @route POST user/login
+ *  @route POST articles
  *  @access public
  *  @err 1. 요청 값이 잘못되었을 경우
  *       2. 존재하지 않는 유저일 경우
