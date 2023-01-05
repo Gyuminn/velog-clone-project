@@ -5,6 +5,7 @@ import { isLogin } from "../middlewares/authMiddleware";
 const router = express.Router();
 
 router.post("/", isLogin, articlesController.postArticleController);
+router.get("/", articlesController.getAllArticlesController);
 router.get("/:articleId", articlesController.getOneArticleController);
 
 module.exports = router;

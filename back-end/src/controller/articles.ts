@@ -59,6 +59,33 @@ const postArticleController = async (req: Request, res: Response) => {
 };
 
 /**
+ *  @게시글리스트조회
+ *  @route GET articles
+ *  @access public
+ *  @err
+ */
+const getAllArticlesController = async (req: Request, res: Response) => {
+  try {
+    const resData = await articlesService.getAllArticlesService();
+
+    return response.dataResponse(
+      res,
+      returnCode.OK,
+      true,
+      "게시물 리스트 조회 성공",
+      resData
+    );
+  } catch (err) {
+    return response.basicResponse(
+      res,
+      returnCode.INTERNAL_SERVER_ERROR,
+      false,
+      `서버 오류: ${err.message}`
+    );
+  }
+};
+
+/**
  *  @게시글단일조회
  *  @route GET articles/:articleId
  *  @access public
@@ -119,6 +146,7 @@ const getOneArticleController = async (req: Request, res: Response) => {
 const articlesController = {
   postArticleController,
   getOneArticleController,
+  getAllArticlesController,
 };
 
 export default articlesController;

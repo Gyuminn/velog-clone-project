@@ -57,8 +57,35 @@ const postArticleService = async (
  *  @access public
  *  @err
  */
-const getAllArticlesService = async (sortingMethod: string) => {
+const getAllArticlesService = async () => {
   // 커서 기반 페이지네이션 구현
+  /**
+   * TODO
+   * 추후 매개변수로 sortingMethod를 추가적으로 받아
+   * 1. 게시글의 좋아요가 많은 순
+   * 2. 새롭게 생성된 게시글 순서
+   * 우선 2번으로 페이지네이션 구현
+   */
+
+  // velog의 경우 기본적으로 게시물을 특정 개수만큼 렌더링시키기 때문에
+  // cursor가 없을 경우 에러를 발생시키는 것이 아니라 기본 값으로 세팅
+  // if (!cursor) cursor = "0";
+
+  const articlesToShow = await Board.findAll({
+    attributes: [
+      "user_id",
+      "board_id",
+      "title",
+      "thumbnailContent",
+      "thumbnailImageUrl",
+    ],
+    order: [
+      ["updatedAt", "DESC"],
+      ["board_id", "ASC"],
+    ],
+  });
+
+  return { articlesToShow };
 };
 
 /**
@@ -105,6 +132,7 @@ const getOneArticleService = async (articleId: string) => {
 const articlesService = {
   postArticleService,
   getOneArticleService,
+  getAllArticlesService,
 };
 
 export default articlesService;
