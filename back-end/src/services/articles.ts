@@ -5,23 +5,23 @@ import { Op } from "sequelize";
 /**
  *  @게시글작성 게시글 작성
  *  @route POST articles
- *  @access public
+ *  @access private
  *  @err 1. 요청 값이 잘못되었을 경우
- *       2. 존재하지 않는 유저
  */
 const postArticleService = async (
   email: string,
   title: string,
-  /**
-   * TODO
-   * 프론트엔드에서 에디터 라이브러리를 이용했을 때 content에 이미지 첨부파일이 어떻게 리턴되는지 확인이 필요합니다.
-   * 우선은 string으로 처리하고 추후 이미지 업로드 기능을 구현할 예정입니다.
-   */
   content: string,
   thumbnailContent: string,
   thumbnailImageUrl: string,
   tags: string[]
 ) => {
+  /**
+   * TODO
+   * 프론트엔드에서 에디터 라이브러리를 이용했을 때 content에 이미지 첨부파일이 어떻게 리턴되는지 확인이 필요합니다.
+   * 우선은 string으로 처리하고 추후 이미지 업로드 기능을 구현할 예정입니다.
+   */
+
   // 요청 값이 잘못되었을 경우
   if (
     !email ||
@@ -33,12 +33,10 @@ const postArticleService = async (
     return constant.NULL_VALUE;
   }
 
-  const user = await User.findOne({ where: { email } });
-
-  // 존재하지 않는 유저일 경우
-  if (!user) {
-    return constant.NON_EXISTENT_USER;
-  }
+  const user = await User.findOne({
+    attributes: ["user_id"],
+    where: { email },
+  });
 
   // 게시글 업로드
   const createdArticle = await Board.create({
@@ -53,12 +51,73 @@ const postArticleService = async (
 };
 
 /**
+ *  @게시글수정
+ *  @route PATCH /articles/:articleId
+ *  @access private
+ *  @err 1. 필요한 값이 없을 때
+ *       2. 게시글이 존재하지 않을 경우
+ *       3. 수정 권한이 없을 경우
+ */
+const patchArticleService = async (
+  email: string,
+  articleId: string,
+  title: string,
+  content: string,
+  thumbnailContent: string,
+  thumbnailImageUrl: string,
+  tags: string[]
+) => {
+  // 요청 값이 잘못되었을 경우
+  if (
+    !email ||
+    !articleId ||
+    title === undefined ||
+    title === null ||
+    content === undefined ||
+    content === null
+  ) {
+    return constant.NULL_VALUE;
+  }
+
+  const user = await User.findOne({
+    attributes: ["user_id"],
+    where: { email },
+  });
+
+  const originalArticle = await Board.findOne({
+    where: { board_id: articleId },
+  });
+
+  // 게시글이 존재하지 않을 경우
+  if (!originalArticle) {
+    return constant.DB_NOT_FOUND;
+  }
+
+  // 수정 권한이 없을 경우
+  if (user.user_id !== originalArticle.user_id) {
+    return constant.WRONG_REQUEST_VALUE;
+  }
+
+  await Board.update(
+    {
+      title,
+      content,
+      thumbnailContent,
+      thumbnailImageUrl,
+    },
+    { where: { board_id: articleId } }
+  );
+
+  return constant.SUCCESS;
+};
+
+/**
  *  @게시글리스트조회
  *  @route GET articles
  *  @access public
  *  @err
  */
-const getAllArticlesService = async (cursor: string) => {
+const getAllArticlesService = async (cursor: string | undefined) => {
   // 커서 기반 페이지네이션 구현
   /**
    * TODO
@@ -69,7 +128,7 @@ const getAllArticlesService = async (cursor: string) => {
    */
 
   const limit = 5;
-  if (+cursor === 0) cursor = await Board.max("board_id");
+  if (+cursor === -1 || undefined) cursor = await Board.max("board_id");
 
   const articlesToShow = await Board.findAll({
     limit,
@@ -141,6 +200,7 @@ const articlesService = {
   postArticleService,
   getOneArticleService,
   getAllArticlesService,
+  patchArticleService,
 };
 
 export default articlesService;

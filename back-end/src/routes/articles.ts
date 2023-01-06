@@ -7,5 +7,6 @@ const router = express.Router();
 router.post("/", isLogin, articlesController.postArticleController);
 router.get("/:cursor", articlesController.getAllArticlesController);
 router.get("/:articleId", articlesController.getOneArticleController);
+router.patch("/:articleId", isLogin, articlesController.patchArticleController);
 
 module.exports = router;
