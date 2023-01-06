@@ -1,5 +1,6 @@
 import constant from "../lib/constant";
 import { Board, Tag, User } from "../models";
+import { Op } from "sequelize";
 
 /**
  *  @게시글작성 게시글 작성
@@ -57,7 +58,7 @@ const postArticleService = async (
  *  @access public
  *  @err
  */
-const getAllArticlesService = async () => {
+const getAllArticlesService = async (cursor: string) => {
   // 커서 기반 페이지네이션 구현
   /**
    * TODO
@@ -67,11 +68,11 @@ const getAllArticlesService = async () => {
    * 우선 2번으로 페이지네이션 구현
    */
 
-  // velog의 경우 기본적으로 게시물을 특정 개수만큼 렌더링시키기 때문에
-  // cursor가 없을 경우 에러를 발생시키는 것이 아니라 기본 값으로 세팅
-  // if (!cursor) cursor = "0";
+  const limit = 5;
+  if (+cursor === 0) cursor = await Board.max("board_id");
 
   const articlesToShow = await Board.findAll({
+    limit,
     attributes: [
       "user_id",
       "board_id",
@@ -79,13 +80,20 @@ const getAllArticlesService = async () => {
       "thumbnailContent",
       "thumbnailImageUrl",
     ],
-    order: [
-      ["updatedAt", "DESC"],
-      ["board_id", "ASC"],
-    ],
+    where: {
+      board_id: {
+        [Op.lte]: cursor,
+      },
+    },
+    order: [["board_id", "DESC"]],
   });
 
-  return { articlesToShow };
+  const nextCursor =
+    articlesToShow.length === limit
+      ? articlesToShow[articlesToShow.length - 1].board_id - 1
+      : null;
+
+  return { ...articlesToShow, nextCursor };
 };
 
 /**

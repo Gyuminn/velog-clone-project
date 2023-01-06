@@ -12,7 +12,6 @@ import constant from "../lib/constant";
  *       2. 존재하지 않는 유저일 경우
  */
 const postArticleController = async (req: Request, res: Response) => {
-  console.log("컨트롤러 요청");
   try {
     const resData = await articlesService.postArticleService(
       req.user.email,
@@ -62,11 +61,13 @@ const postArticleController = async (req: Request, res: Response) => {
  *  @게시글리스트조회
  *  @route GET articles
  *  @access public
- *  @err
+ *  @err 1. 필요한 값이 없을 경우
  */
 const getAllArticlesController = async (req: Request, res: Response) => {
   try {
-    const resData = await articlesService.getAllArticlesService();
+    const resData = await articlesService.getAllArticlesService(
+      req.params.cursor
+    );
 
     return response.dataResponse(
       res,
