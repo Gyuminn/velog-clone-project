@@ -9,7 +9,7 @@ import { Op } from "sequelize";
  *  @err 1. 요청 값이 잘못되었을 경우
  */
 const postArticleService = async (
-  email: string,
+  userId: string,
   title: string,
   content: string,
   thumbnailContent: string,
@@ -24,7 +24,7 @@ const postArticleService = async (
 
   // 요청 값이 잘못되었을 경우
   if (
-    !email ||
+    !userId ||
     title === undefined ||
     title === null ||
     content === undefined ||
@@ -33,14 +33,9 @@ const postArticleService = async (
     return constant.NULL_VALUE;
   }
 
-  const user = await User.findOne({
-    attributes: ["user_id"],
-    where: { email },
-  });
-
   // 게시글 업로드
   const createdArticle = await Board.create({
-    user_id: user.user_id,
+    user_id: userId,
     title,
     content,
     thumbnailContent,

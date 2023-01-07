@@ -14,7 +14,7 @@ import constant from "../lib/constant";
 const postArticleController = async (req: Request, res: Response) => {
   try {
     const resData = await articlesService.postArticleService(
-      req.user.email,
+      req.user.user_id,
       req.body.title,
       req.body.content,
       req.body.thumbnailContent,
