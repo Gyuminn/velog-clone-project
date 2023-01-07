@@ -186,11 +186,48 @@ const getOneArticleService = async (articleId: string) => {
   };
 };
 
+/**
+ *  @게시글삭제
+ *  @route DELETE articles/:articleId
+ *  @access private
+ *  @err  1. 필요한 값이 없을 때
+ *        2. 게시글이 존재하지 않을 때
+ *        3. 삭제 권한이 없을 경우
+ */
+const deleteArticleService = async (userId: number, articleId: string) => {
+  // 1. 필요한 값이 없을 때
+  if (!userId || !articleId) {
+    return constant.NULL_VALUE;
+  }
+
+  const originalArticle = await Board.findOne({
+    where: { board_id: articleId },
+  });
+
+  // 2. 게시글이 존재하지 않을 때
+  if (!originalArticle) {
+    return constant.DB_NOT_FOUND;
+  }
+
+  // 3. 삭제 권한이 없을 경우
+  if (userId !== originalArticle.user_id) {
+    return constant.WRONG_REQUEST_VALUE;
+  }
+
+  // 게시글 삭제
+  await Board.destroy({
+    where: { board_id: originalArticle.board_id },
+  });
+
+  return constant.SUCCESS;
+};
+
 const articlesService = {
   postArticleService,
   getOneArticleService,
   getAllArticlesService,
   patchArticleService,
+  deleteArticleService,
 };
 
 export default articlesService;

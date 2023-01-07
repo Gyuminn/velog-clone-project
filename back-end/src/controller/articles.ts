@@ -198,11 +198,70 @@ const getOneArticleController = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ *  @게시글삭제
+ *  @route DELETE articles/:articleId
+ *  @access private
+ *  @err  1. 필요한 값이 없을 때
+ *        2. 게시글이 존재하지 않을 때
+ *        3. 삭제 권한이 없을 경우
+ */
+const deleteArticleController = async (req: Request, res: Response) => {
+  try {
+    const resData = await articlesService.deleteArticleService(
+      req.user.user_id,
+      req.params.articleId
+    );
+
+    if (resData === constant.NULL_VALUE) {
+      return response.basicResponse(
+        res,
+        returnCode.BAD_REQUEST,
+        false,
+        "필요한 값이 존재하지 않습니다."
+      );
+    }
+
+    if (resData === constant.DB_NOT_FOUND) {
+      return response.basicResponse(
+        res,
+        returnCode.BAD_REQUEST,
+        false,
+        "존재하지 않거나 삭제된 게시글입니다."
+      );
+    }
+
+    if (resData === constant.WRONG_REQUEST_VALUE) {
+      return response.basicResponse(
+        res,
+        returnCode.BAD_REQUEST,
+        false,
+        "삭제 권한이 존재하지 않습니다."
+      );
+    }
+
+    return response.basicResponse(
+      res,
+      returnCode.OK,
+      true,
+      "게시글 삭제가 완료되었습니다."
+    );
+  } catch (err) {
+    return response.basicResponse(
+      res,
+      returnCode.INTERNAL_SERVER_ERROR,
+      false,
+      `서버 에러: ${err.message}`
+    );
+  }
+};
+
 const articlesController = {
   postArticleController,
   getOneArticleController,
   getAllArticlesController,
   patchArticleController,
+  deleteArticleController,
 };
 
 export default articlesController;
