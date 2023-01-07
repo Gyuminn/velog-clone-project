@@ -59,7 +59,7 @@ const postArticleController = async (req: Request, res: Response) => {
 const patchArticleController = async (req: Request, res: Response) => {
   try {
     const resData = await articlesService.patchArticleService(
-      req.user.email,
+      req.user.user_id,
       req.params.articleId,
       req.body.title,
       req.body.content,

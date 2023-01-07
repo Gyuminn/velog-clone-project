@@ -9,7 +9,7 @@ import { Op } from "sequelize";
  *  @err 1. 요청 값이 잘못되었을 경우
  */
 const postArticleService = async (
-  userId: string,
+  userId: number,
   title: string,
   content: string,
   thumbnailContent: string,
@@ -54,7 +54,7 @@ const postArticleService = async (
  *       3. 수정 권한이 없을 경우
  */
 const patchArticleService = async (
-  email: string,
+  userId: number,
   articleId: string,
   title: string,
   content: string,
@@ -64,7 +64,7 @@ const patchArticleService = async (
 ) => {
   // 요청 값이 잘못되었을 경우
   if (
-    !email ||
+    !userId ||
     !articleId ||
     title === undefined ||
     title === null ||
@@ -73,11 +73,6 @@ const patchArticleService = async (
   ) {
     return constant.NULL_VALUE;
   }
-
-  const user = await User.findOne({
-    attributes: ["user_id"],
-    where: { email },
-  });
 
   const originalArticle = await Board.findOne({
     where: { board_id: articleId },
@@ -89,7 +84,7 @@ const patchArticleService = async (
   }
 
   // 수정 권한이 없을 경우
-  if (user.user_id !== originalArticle.user_id) {
+  if (userId !== originalArticle.user_id) {
     return constant.WRONG_REQUEST_VALUE;
   }
 
