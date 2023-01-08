@@ -4,7 +4,7 @@ import { Op } from "sequelize";
 
 /**
  *  @게시글작성 게시글 작성
- *  @route POST articles
+ *  @route POST /articles
  *  @access private
  *  @err 1. 요청 값이 잘못되었을 경우
  */
@@ -103,7 +103,7 @@ const patchArticleService = async (
 
 /**
  *  @게시글리스트조회
- *  @route GET articles
+ *  @route GET /articles?cursor=
  *  @access public
  *  @err
  */
@@ -118,7 +118,7 @@ const getAllArticlesService = async (cursor: string | undefined) => {
    */
 
   const limit = 5;
-  if (+cursor === -1 || undefined) cursor = await Board.max("board_id");
+  if (cursor === undefined) cursor = await Board.max("board_id");
 
   const articlesToShow = await Board.findAll({
     limit,

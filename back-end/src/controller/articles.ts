@@ -6,7 +6,7 @@ import returnCode from "../lib/returnCode";
 import constant from "../lib/constant";
 /**
  *  @게시글작성 게시글 작성
- *  @route POST articles
+ *  @route POST /articles
  *  @access private
  *  @err 1. 요청 값이 잘못되었을 경우
  *       2. 존재하지 않는 유저일 경우
@@ -113,14 +113,14 @@ const patchArticleController = async (req: Request, res: Response) => {
 
 /**
  *  @게시글리스트조회
- *  @route GET articles
+ *  @route GET /articles?cursor=
  *  @access public
  *  @err 1. 필요한 값이 없을 경우
  */
 const getAllArticlesController = async (req: Request, res: Response) => {
   try {
     const resData = await articlesService.getAllArticlesService(
-      req.params.cursor
+      req.query.cursor ? String(req.query.cursor) : undefined
     );
 
     return response.dataResponse(
