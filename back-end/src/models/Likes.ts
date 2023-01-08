@@ -9,20 +9,20 @@ import {
   ForeignKey,
   BelongsTo,
   AllowNull,
+  Default,
 } from "sequelize-typescript";
 import Board from "./Board";
 import User from "./User";
 
 @Table({
-  modelName: "Like",
-  tableName: "Like",
+  modelName: "Likes",
+  tableName: "Likes",
   underscored: false,
   timestamps: true,
-  paranoid: true,
   charset: "utf8",
   collate: "utf8_general_ci",
 })
-export default class Like extends Model {
+export default class Likes extends Model {
   @PrimaryKey
   @AutoIncrement
   @Unique
@@ -38,6 +38,10 @@ export default class Like extends Model {
   @AllowNull(false)
   @Column
   public user_id!: number;
+
+  @Default(false)
+  @Column
+  public isDeleted!: boolean;
 
   @BelongsTo(() => Board)
   board: Board;

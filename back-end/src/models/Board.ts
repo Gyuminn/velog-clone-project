@@ -14,7 +14,7 @@ import {
 } from "sequelize-typescript";
 import Comment from "./Comment";
 import File from "./File";
-import Like from "./Like";
+import Likes from "./Likes";
 import Tag from "./Tag";
 import User from "./User";
 
@@ -66,6 +66,6 @@ export default class Board extends Model {
   @HasMany(() => Tag)
   tags: Tag[];
 
-  @HasMany(() => Like)
-  likes: Like[];
+  @HasMany(() => Likes)
+  likes: Likes[];
 }

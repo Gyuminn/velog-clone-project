@@ -1,5 +1,5 @@
 import constant from "../lib/constant";
-import { Board, Like, Tag, User } from "../models";
+import sequelize, { Board, Likes, Tag, User } from "../models";
 import { Op } from "sequelize";
 
 /**
@@ -121,20 +121,40 @@ const getAllArticlesService = async (cursor: string | undefined) => {
   if (cursor === undefined) cursor = await Board.max("board_id");
 
   const articlesToShow = await Board.findAll({
-    limit,
     attributes: [
       "user_id",
       "board_id",
       "title",
       "thumbnailContent",
       "thumbnailImageUrl",
+      // [sequelize.fn(`COUNT`, sequelize.col(`Like.board_id`)), "like_count"],
+      [
+        sequelize.literal(
+          "SELECT COUNT(`Like`.`board_id`) FROM `Like` WHERE `Board`.`board_id` = `Like`.`board_id`"
+        ),
+        "like_count",
+      ],
     ],
+    // include: [
+    //   {
+    //     // left outer join
+    //     model: Like,
+    //     attributes: [],
+    //     where: {
+    //       board_id: {
+    //         [Op.col]: sequelize.col(`Board.board_id`),
+    //       },
+    //     },
+    //     required: false,
+    //   },
+    // ],
     where: {
       board_id: {
         [Op.lte]: cursor,
       },
     },
     order: [["board_id", "DESC"]],
+    limit,
   });
 
   const nextCursor =
@@ -224,23 +244,46 @@ const deleteArticleService = async (userId: number, articleId: string) => {
 
 /**
  *  @게시글좋아요추가
- *  @route POST /articles/:articleId/like
+ *  @route POST /articles/:articleId/likes
  *  @access private
  *  @err 1. 필요한 값이 없을 때
  *
  */
-const postArticleLikeService = async (userId: number, articleId: string) => {
+const postArticleLikesService = async (userId: number, articleId: string) => {
   // 1. 필요한 값이 없을 때
   if (!userId || !articleId) {
     return constant.NULL_VALUE;
   }
 
-  await Like.create({
-    board_id: articleId,
-    user_id: userId,
+  const likedArticle = await Likes.findOne({
+    where: {
+      board_id: articleId,
+      user_id: userId,
+    },
   });
 
-  return constant.SUCCESS;
+  if (!likedArticle) {
+    await Likes.create({
+      board_id: articleId,
+      user_id: userId,
+    });
+
+    return { isDeleted: false };
+  }
+
+  await Likes.update(
+    {
+      isDeleted: likedArticle.isDeleted ? false : true,
+    },
+    {
+      where: {
+        board_id: articleId,
+        user_id: userId,
+      },
+    }
+  );
+
+  return { isDeleted: likedArticle.isDeleted ? false : true };
 };
 
 const articlesService = {
@@ -249,7 +292,7 @@ const articlesService = {
   getAllArticlesService,
   patchArticleService,
   deleteArticleService,
-  postArticleLikeService,
+  postArticleLikesService,
 };
 
 export default articlesService;
