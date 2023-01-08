@@ -130,7 +130,7 @@ const getAllArticlesService = async (cursor: string | undefined) => {
       "thumbnailImageUrl",
       [
         Sequelize.literal(
-          `(SELECT COUNT(*) FROM Likes as likes WHERE Board.board_id = likes.board_id)`
+          `(SELECT COUNT(*) FROM Likes as likes WHERE Board.board_id = likes.board_id AND isDeleted = false)`
         ),
         "likeCounts",
       ],
