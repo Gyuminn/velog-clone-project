@@ -1,21 +1,26 @@
 {
   "compilerOptions": {
-    "target": "es6", /* ECMAScript 목표 버전 설정: 'ES3'(기본), 'ES5', 'ES2015', 'ES2016', 'ES2017','ES2018', 'ES2019', 'ES2020', or 'ESNEXT'. */
-    "experimentalDecorators": true, /* 데코레이터는 자바의 어노테이션과 비슷한 기능으로, 데코레이터가 붙은 클래스, 변수, 함수 등 데코레이터에서 정의된 기능이 동작하는 것을 뜻한다. */
-    "emitDecoratorMetadata": true, /* 이것 또한 true로 설정해줘야 한다 */
-    "module": "commonjs", /* 생성될 모듈 코드 설정: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', 'es2020', or 'ESNext'. */
-    "moduleResolution": "node", /* 모듈 해석 방법 설정 */
-    "pretty": true, /* 에러 메시지를 예쁘게 출력 */
-    "typeRoots": ["./src/types/express.d.ts", "./node_modules/@types"], /* 타입(*.d.ts) 파일을 가져올 디렉토리를 설정. 설정하지 않을 경우 ./node_modules/@types */
-    "allowJs": true, /* 자바스크립트 컴파일 허용 여부 */
-    "sourceMap": true, /* sourcemap file(xxx.js.map) 을 생성할 것인지 유무. 이 파일이 javascript와 함께 생성되면 디버거나 다른 툴이 본래의 typescript 코드를 볼 수 있도록 해줌. */
-    "outDir": "./dist", /* 컴파일 후 생성되는 js 파일이 생성될 폴더명 */
-    "noEmit": false, /* 결과 파일 내보낼지 여부 */
-    "allowSyntheticDefaultImports": true, /* default export를 쓰지 않은 모듈도 default import가 되게 할 것인지*/
-    "esModuleInterop": true, /* commonjs 방식으로 내보낸 모듈을 es모듈 방식의 import로 가져올 수 있게 해준다. */
-    "forceConsistentCasingInFileNames": true, /* 같은 파일에 대한 일관되지 않은 참조를 가능하게 할 것인가 */
-    "skipLibCheck": true, /* 모든 선언 파일(*.d.ts)의 유형 검사를 건너뛸지 여부 */
+    "target": "es6" /* ECMAScript 목표 버전 설정: 'ES3'(기본), 'ES5', 'ES2015', 'ES2016', 'ES2017','ES2018', 'ES2019', 'ES2020', or 'ESNEXT'. */,
+    "experimentalDecorators": true /* 데코레이터는 자바의 어노테이션과 비슷한 기능으로, 데코레이터가 붙은 클래스, 변수, 함수 등 데코레이터에서 정의된 기능이 동작하는 것을 뜻한다. */,
+    "emitDecoratorMetadata": true /* 이것 또한 true로 설정해줘야 한다 */,
+    "module": "commonjs" /* 생성될 모듈 코드 설정: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', 'es2020', or 'ESNext'. */,
+    "moduleResolution": "node" /* 모듈 해석 방법 설정 */,
+    "pretty": true /* 에러 메시지를 예쁘게 출력 */,
+    "typeRoots": [
+      "./src/types",
+      "./node_modules/@types"
+    ] /* 타입(*.d.ts) 파일을 가져올 디렉토리를 설정. 설정하지 않을 경우 ./node_modules/@types */,
+    "allowJs": true /* 자바스크립트 컴파일 허용 여부 */,
+    "sourceMap": true /* sourcemap file(xxx.js.map) 을 생성할 것인지 유무. 이 파일이 javascript와 함께 생성되면 디버거나 다른 툴이 본래의 typescript 코드를 볼 수 있도록 해줌. */,
+    "outDir": "./dist" /* 컴파일 후 생성되는 js 파일이 생성될 폴더명 */,
+    "noEmit": false /* 결과 파일 내보낼지 여부 */,
+    "allowSyntheticDefaultImports": true /* default export를 쓰지 않은 모듈도 default import가 되게 할 것인지*/,
+    "esModuleInterop": true /* commonjs 방식으로 내보낸 모듈을 es모듈 방식의 import로 가져올 수 있게 해준다. */,
+    "forceConsistentCasingInFileNames": true /* 같은 파일에 대한 일관되지 않은 참조를 가능하게 할 것인가 */,
+    "skipLibCheck": true /* 모든 선언 파일(*.d.ts)의 유형 검사를 건너뛸지 여부 */
   },
-  "include": ["./src/**/*"], /* 컴파일할 파일의 경로를 설정한다. [src 폴더 하위의 모든 파일] */
+  "include": [
+    "./src/**/*"
+  ] /* 컴파일할 파일의 경로를 설정한다. [src 폴더 하위의 모든 파일] */,
   "exclude": ["node_modules", "tests"] /* 컴파일 대상을 제외하는 설정. */
 }

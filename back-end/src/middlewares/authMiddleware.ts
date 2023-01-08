@@ -3,18 +3,25 @@ import jwt from "jsonwebtoken";
 import config from "../config";
 import { IToken } from "../interface/IToken";
 import { User } from "../models";
+import response from "../lib/response";
+import returnCode from "../lib/returnCode";
 
 export const isLogin = async (req: Request, res: Response, next) => {
-  // 로그인 변수
   // 토큰이 없을 경우
   if (
     req.headers.authorization === "" ||
     req.headers.authorization === undefined ||
     req.headers.authorization === null
   ) {
-    return next();
+    return response.basicResponse(
+      res,
+      returnCode.BAD_REQUEST,
+      false,
+      "토큰 값이 요청되지 않았습니다."
+    );
   }
 
+  // Verify token
   try {
     // 적합한 토큰이 있을 경우
     // 로그인 상태
@@ -31,6 +38,21 @@ export const isLogin = async (req: Request, res: Response, next) => {
 
     return next();
   } catch (err) {
-    return next();
+    // 토큰이 만료되었을 경우
+    if (err.message == "jwt expired") {
+      return response.basicResponse(
+        res,
+        returnCode.UNAUTHORIZED,
+        false,
+        "만료된 토큰입니다"
+      );
+    }
+    // 잘못된 토큰일 경우
+    return response.basicResponse(
+      res,
+      returnCode.UNAUTHORIZED,
+      false,
+      "적합하지 않은 토큰입니다"
+    );
   }
 };
