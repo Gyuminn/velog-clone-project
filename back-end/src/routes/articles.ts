@@ -13,5 +13,10 @@ router.delete(
   isLogin,
   articlesController.deleteArticleController
 );
+router.post(
+  "/:articleId/like",
+  isLogin,
+  articlesController.postArticleLikeController
+);
 
 module.exports = router;

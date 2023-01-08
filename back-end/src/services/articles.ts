@@ -1,5 +1,5 @@
 import constant from "../lib/constant";
-import { Board, Tag, User } from "../models";
+import { Board, Like, Tag, User } from "../models";
 import { Op } from "sequelize";
 
 /**
@@ -222,12 +222,34 @@ const deleteArticleService = async (userId: number, articleId: string) => {
   return constant.SUCCESS;
 };
 
+/**
+ *  @게시글좋아요추가
+ *  @route POST /articles/:articleId/like
+ *  @access private
+ *  @err 1. 필요한 값이 없을 때
+ *
+ */
+const postArticleLikeService = async (userId: number, articleId: string) => {
+  // 1. 필요한 값이 없을 때
+  if (!userId || !articleId) {
+    return constant.NULL_VALUE;
+  }
+
+  await Like.create({
+    board_id: articleId,
+    user_id: userId,
+  });
+
+  return constant.SUCCESS;
+};
+
 const articlesService = {
   postArticleService,
   getOneArticleService,
   getAllArticlesService,
   patchArticleService,
   deleteArticleService,
+  postArticleLikeService,
 };
 
 export default articlesService;

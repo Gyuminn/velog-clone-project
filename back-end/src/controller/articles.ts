@@ -256,12 +256,52 @@ const deleteArticleController = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ *  @게시글좋아요추가
+ *  @route POST /articles/:articleId/like
+ *  @access private
+ *  @err 1. 필요한 값이 없을 때
+ *
+ */
+const postArticleLikeController = async (req: Request, res: Response) => {
+  try {
+    const resData = await articlesService.postArticleLikeService(
+      req.user.user_id,
+      req.params.articleId
+    );
+
+    if (resData === constant.NULL_VALUE) {
+      return response.basicResponse(
+        res,
+        returnCode.BAD_REQUEST,
+        false,
+        "필요한 값이 존재하지 않습니다."
+      );
+    }
+
+    return response.basicResponse(
+      res,
+      returnCode.OK,
+      true,
+      "좋아하는 게시물에 추가되었습니다."
+    );
+  } catch (err) {
+    return response.basicResponse(
+      res,
+      returnCode.INTERNAL_SERVER_ERROR,
+      false,
+      `서버 오류: ${err.message}`
+    );
+  }
+};
+
 const articlesController = {
   postArticleController,
   getOneArticleController,
   getAllArticlesController,
   patchArticleController,
   deleteArticleController,
+  postArticleLikeController,
 };
 
 export default articlesController;
