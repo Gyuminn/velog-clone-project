@@ -1,6 +1,7 @@
 import constant from "../lib/constant";
 import sequelize, { Board, Likes, Tag, User } from "../models";
 import { Op } from "sequelize";
+import { Sequelize } from "sequelize-typescript";
 
 /**
  *  @게시글작성 게시글 작성
@@ -127,27 +128,13 @@ const getAllArticlesService = async (cursor: string | undefined) => {
       "title",
       "thumbnailContent",
       "thumbnailImageUrl",
-      // [sequelize.fn(`COUNT`, sequelize.col(`Like.board_id`)), "like_count"],
       [
-        sequelize.literal(
-          "SELECT COUNT(`Like`.`board_id`) FROM `Like` WHERE `Board`.`board_id` = `Like`.`board_id`"
+        Sequelize.literal(
+          `(SELECT COUNT(*) FROM Likes as likes WHERE Board.board_id = likes.board_id)`
         ),
-        "like_count",
+        "likeCounts",
       ],
     ],
-    // include: [
-    //   {
-    //     // left outer join
-    //     model: Like,
-    //     attributes: [],
-    //     where: {
-    //       board_id: {
-    //         [Op.col]: sequelize.col(`Board.board_id`),
-    //       },
-    //     },
-    //     required: false,
-    //   },
-    // ],
     where: {
       board_id: {
         [Op.lte]: cursor,
@@ -193,6 +180,12 @@ const getOneArticleService = async (articleId: string) => {
     where: { user_id: articleToShow.user_id },
   });
 
+  const likesCount = await Likes.count({
+    where: {
+      board_id: articleId,
+    },
+  });
+
   if (!userEmailToShow) {
     return constant.NON_EXISTENT_USER;
   }
@@ -203,6 +196,7 @@ const getOneArticleService = async (articleId: string) => {
     content: articleToShow.content,
     // 게시글 단일 조회에서 thumbnailContent는 보여지지 않는다.
     thumbnailImageUrl: articleToShow.thumbnailImageUrl,
+    likesCount,
   };
 };
 
