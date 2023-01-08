@@ -28,6 +28,7 @@ export const isLogin = async (req: Request, res: Response, next) => {
     const token: string = req.headers.authorization;
     const decoded = jwt.verify(token, config.jwtSecret);
 
+    console.log(`decoded: ${decoded}`);
     const user = await User.findOne({
       where: { email: (decoded as IToken).user.email },
     });
