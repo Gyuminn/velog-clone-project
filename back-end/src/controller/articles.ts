@@ -6,7 +6,7 @@ import returnCode from "../lib/returnCode";
 import constant from "../lib/constant";
 /**
  *  @게시글작성 게시글 작성
- *  @route POST articles
+ *  @route POST /articles
  *  @access private
  *  @err 1. 요청 값이 잘못되었을 경우
  *       2. 존재하지 않는 유저일 경우
@@ -113,14 +113,14 @@ const patchArticleController = async (req: Request, res: Response) => {
 
 /**
  *  @게시글리스트조회
- *  @route GET articles
+ *  @route GET /articles?cursor=
  *  @access public
  *  @err 1. 필요한 값이 없을 경우
  */
 const getAllArticlesController = async (req: Request, res: Response) => {
   try {
     const resData = await articlesService.getAllArticlesService(
-      req.params.cursor
+      req.query.cursor ? String(req.query.cursor) : undefined
     );
 
     return response.dataResponse(
@@ -256,12 +256,53 @@ const deleteArticleController = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ *  @게시글좋아요추가
+ *  @route POST /articles/:articleId/likes
+ *  @access private
+ *  @err 1. 필요한 값이 없을 때
+ *
+ */
+const postArticleLikesController = async (req: Request, res: Response) => {
+  try {
+    const resData = await articlesService.postArticleLikesService(
+      req.user.user_id,
+      req.params.articleId
+    );
+
+    if (resData === constant.NULL_VALUE) {
+      return response.basicResponse(
+        res,
+        returnCode.BAD_REQUEST,
+        false,
+        "필요한 값이 존재하지 않습니다."
+      );
+    }
+
+    return response.dataResponse(
+      res,
+      returnCode.OK,
+      true,
+      "좋아하는 게시물에 추가/삭제 되었습니다.",
+      resData
+    );
+  } catch (err) {
+    return response.basicResponse(
+      res,
+      returnCode.INTERNAL_SERVER_ERROR,
+      false,
+      `서버 오류: ${err.message}`
+    );
+  }
+};
+
 const articlesController = {
   postArticleController,
   getOneArticleController,
   getAllArticlesController,
   patchArticleController,
   deleteArticleController,
+  postArticleLikesController,
 };
 
 export default articlesController;

@@ -1,10 +1,11 @@
 import constant from "../lib/constant";
-import { Board, Tag, User } from "../models";
+import sequelize, { Board, Likes, Tag, User } from "../models";
 import { Op } from "sequelize";
+import { Sequelize } from "sequelize-typescript";
 
 /**
  *  @게시글작성 게시글 작성
- *  @route POST articles
+ *  @route POST /articles
  *  @access private
  *  @err 1. 요청 값이 잘못되었을 경우
  */
@@ -103,7 +104,7 @@ const patchArticleService = async (
 
 /**
  *  @게시글리스트조회
- *  @route GET articles
+ *  @route GET /articles?cursor=
  *  @access public
  *  @err
  */
@@ -118,16 +119,21 @@ const getAllArticlesService = async (cursor: string | undefined) => {
    */
 
   const limit = 5;
-  if (+cursor === -1 || undefined) cursor = await Board.max("board_id");
+  if (cursor === undefined) cursor = await Board.max("board_id");
 
   const articlesToShow = await Board.findAll({
-    limit,
     attributes: [
       "user_id",
       "board_id",
       "title",
       "thumbnailContent",
       "thumbnailImageUrl",
+      [
+        Sequelize.literal(
+          `(SELECT COUNT(*) FROM Likes as likes WHERE Board.board_id = likes.board_id AND isDeleted = false)`
+        ),
+        "likeCounts",
+      ],
     ],
     where: {
       board_id: {
@@ -135,6 +141,7 @@ const getAllArticlesService = async (cursor: string | undefined) => {
       },
     },
     order: [["board_id", "DESC"]],
+    limit,
   });
 
   const nextCursor =
@@ -173,6 +180,12 @@ const getOneArticleService = async (articleId: string) => {
     where: { user_id: articleToShow.user_id },
   });
 
+  const likesCount = await Likes.count({
+    where: {
+      board_id: articleId,
+    },
+  });
+
   if (!userEmailToShow) {
     return constant.NON_EXISTENT_USER;
   }
@@ -183,6 +196,7 @@ const getOneArticleService = async (articleId: string) => {
     content: articleToShow.content,
     // 게시글 단일 조회에서 thumbnailContent는 보여지지 않는다.
     thumbnailImageUrl: articleToShow.thumbnailImageUrl,
+    likesCount,
   };
 };
 
@@ -222,12 +236,57 @@ const deleteArticleService = async (userId: number, articleId: string) => {
   return constant.SUCCESS;
 };
 
+/**
+ *  @게시글좋아요추가
+ *  @route POST /articles/:articleId/likes
+ *  @access private
+ *  @err 1. 필요한 값이 없을 때
+ *
+ */
+const postArticleLikesService = async (userId: number, articleId: string) => {
+  // 1. 필요한 값이 없을 때
+  if (!userId || !articleId) {
+    return constant.NULL_VALUE;
+  }
+
+  const likedArticle = await Likes.findOne({
+    where: {
+      board_id: articleId,
+      user_id: userId,
+    },
+  });
+
+  if (!likedArticle) {
+    await Likes.create({
+      board_id: articleId,
+      user_id: userId,
+    });
+
+    return { isDeleted: false };
+  }
+
+  await Likes.update(
+    {
+      isDeleted: likedArticle.isDeleted ? false : true,
+    },
+    {
+      where: {
+        board_id: articleId,
+        user_id: userId,
+      },
+    }
+  );
+
+  return { isDeleted: likedArticle.isDeleted ? false : true };
+};
+
 const articlesService = {
   postArticleService,
   getOneArticleService,
   getAllArticlesService,
   patchArticleService,
   deleteArticleService,
+  postArticleLikesService,
 };
 
 export default articlesService;

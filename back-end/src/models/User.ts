@@ -12,7 +12,7 @@ import {
 } from "sequelize-typescript";
 import Board from "./Board";
 import Comment from "./Comment";
-import Like from "./Like";
+import Likes from "./Likes";
 import Tag from "./Tag";
 
 @Table({
@@ -67,6 +67,6 @@ export default class User extends Model {
   @HasMany(() => Tag)
   tags: Tag[];
 
-  @HasMany(() => Like)
-  likes: Like[];
+  @HasMany(() => Likes)
+  likes: Likes[];
 }
