@@ -3,7 +3,7 @@ import { Comment } from "../models";
 
 /**
  *  @댓글작성 댓글 작성
- *  @route POST /comments
+ *  @route POST /comment
  *  @access private
  *  @err 1. 요청 값이 잘못되었을 경우
  */
@@ -50,7 +50,7 @@ const postCommentService = async (
 
 /**
  *  @댓글수정
- *  @route /comments/:commentId
+ *  @route /comment/:commentId
  *  @access private
  *  @err 1. 필요한 값이 없을 때
  *       2. 댓글이 존재하지 않을 경우
@@ -90,9 +90,54 @@ const patchCommentService = async (
   return constant.SUCCESS;
 };
 
+/**
+ *  @댓글삭제
+ *  @route DELETE /comment/:commentId
+ *  @access private
+ *  @err 1. 필요한 값이 없을 때
+ *       2. 삭제될 댓글이 없을 때
+ *       3. 삭제 권한이 없을 때
+ */
+const deleteCommentService = async (userId: number, commentId: string) => {
+  // 1. 필요한 값이 없을 때
+  if (!userId || !commentId) {
+    return constant.NULL_VALUE;
+  }
+
+  const originalComment = await Comment.findOne({
+    where: { comment_id: commentId },
+  });
+
+  // 2. 삭제될 댓글이 없을 때
+  if (!originalComment) {
+    return constant.DB_NOT_FOUND;
+  }
+
+  // 3. 삭제 권한이 없을 때
+  if (userId !== originalComment.user_id) {
+    return constant.WRONG_REQUEST_VALUE;
+  }
+
+  // 댓글 삭제
+  await originalComment.update(
+    {
+      isDeleted: true,
+    },
+    {
+      where: {
+        comment_id: commentId,
+        user_id: userId,
+      },
+    }
+  );
+
+  return { isDeleted: true };
+};
+
 const commentsService = {
   postCommentService,
   patchCommentService,
+  deleteCommentService,
 };
 
 export default commentsService;
