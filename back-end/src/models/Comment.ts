@@ -19,7 +19,6 @@ import User from "./User";
   tableName: "Comment",
   underscored: false,
   timestamps: true,
-  paranoid: true,
   charset: "utf8mb4",
   collate: "utf8mb4_general_ci",
 })
@@ -40,6 +39,10 @@ export default class Comment extends Model {
   @Column
   public user_id!: number;
 
+  @AllowNull(false)
+  @Column
+  public commenter!: string;
+
   @Column(DataType.INTEGER)
   public parent!: number;
 
@@ -54,6 +57,10 @@ export default class Comment extends Model {
   @AllowNull(false)
   @Column(DataType.TEXT)
   public content!: string;
+
+  @Default(false)
+  @Column
+  public isDeleted!: boolean;
 
   @BelongsTo(() => User)
   user: User;
