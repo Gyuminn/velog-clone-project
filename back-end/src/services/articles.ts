@@ -1,5 +1,5 @@
 import constant from "../lib/constant";
-import sequelize, { Board, Likes, Tag, User } from "../models";
+import { Board, Likes, Tag, User } from "../models";
 import { Op } from "sequelize";
 import { Sequelize } from "sequelize-typescript";
 
