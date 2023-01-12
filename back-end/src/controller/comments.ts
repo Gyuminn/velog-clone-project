@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import commentService from "../services/comments";
+import commentsService from "../services/comments";
 
 import response from "../lib/response";
 import returnCode from "../lib/returnCode";
@@ -13,7 +13,7 @@ import constant from "../lib/constant";
  */
 const postCommentController = async (req: Request, res: Response) => {
   try {
-    const resData = await commentService.postCommentService(
+    const resData = await commentsService.postCommentService(
       req.user.user_id,
       req.body.articleId,
       req.body.parent,
@@ -48,8 +48,68 @@ const postCommentController = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ *  @댓글수정
+ *  @route /comments/:commentId
+ *  @access private
+ *  @err 1. 필요한 값이 없을 때
+ *       2. 댓글이 존재하지 않을 경우
+ *       3. 수정 권한이 없을 경우
+ */
+const patchCommentController = async (req: Request, res: Response) => {
+  try {
+    const resData = await commentsService.patchCommentService(
+      req.user.user_id,
+      req.params.commentId,
+      req.body.content
+    );
+
+    if (resData === constant.NULL_VALUE) {
+      return response.basicResponse(
+        res,
+        returnCode.BAD_REQUEST,
+        false,
+        "요청 값이 잘못되었습니다."
+      );
+    }
+
+    if (resData === constant.DB_NOT_FOUND) {
+      return response.basicResponse(
+        res,
+        returnCode.BAD_REQUEST,
+        false,
+        "존재하지 않는 댓글입니다."
+      );
+    }
+
+    if (resData === constant.WRONG_REQUEST_VALUE) {
+      return response.basicResponse(
+        res,
+        returnCode.BAD_REQUEST,
+        false,
+        "댓글 수정 권한이 없습니다."
+      );
+    }
+
+    return response.basicResponse(
+      res,
+      returnCode.OK,
+      true,
+      "댓글 수정이 완료되었습니다."
+    );
+  } catch (err) {
+    return response.basicResponse(
+      res,
+      returnCode.BAD_REQUEST,
+      false,
+      `서버 오류: ${err.message}`
+    );
+  }
+};
+
 const commentsController = {
   postCommentController,
+  patchCommentController,
 };
 
 export default commentsController;

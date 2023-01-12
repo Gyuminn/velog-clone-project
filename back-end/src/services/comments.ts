@@ -8,7 +8,7 @@ import { Comment } from "../models";
  *  @err 1. 요청 값이 잘못되었을 경우
  */
 const postCommentService = async (
-  userId: string,
+  userId: number,
   articleId: string,
   parent: string,
   level: string,
@@ -48,8 +48,51 @@ const postCommentService = async (
   return { createdCommentId: createdComment.comment_id };
 };
 
-const commentService = {
-  postCommentService,
+/**
+ *  @댓글수정
+ *  @route /comments/:commentId
+ *  @access private
+ *  @err 1. 필요한 값이 없을 때
+ *       2. 댓글이 존재하지 않을 경우
+ *       3. 수정 권한이 없을 경우
+ */
+const patchCommentService = async (
+  userId: number,
+  commentId: string,
+  content: string
+) => {
+  // 요청 값이 잘못 되었을 경우
+  if (!userId || !commentId || content === undefined || content === null) {
+    return constant.NULL_VALUE;
+  }
+
+  const originalComment = await Comment.findOne({
+    where: { comment_id: commentId },
+  });
+
+  // 댓글이 존재하지 않을 경우
+  if (!originalComment) {
+    return constant.DB_NOT_FOUND;
+  }
+
+  // 수정 권한이 없을 경우
+  if (userId !== originalComment.user_id) {
+    return constant.WRONG_REQUEST_VALUE;
+  }
+
+  await Comment.update(
+    {
+      content,
+    },
+    { where: { comment_id: commentId } }
+  );
+
+  return constant.SUCCESS;
 };
 
-export default commentService;
+const commentsService = {
+  postCommentService,
+  patchCommentService,
+};
+
+export default commentsService;
