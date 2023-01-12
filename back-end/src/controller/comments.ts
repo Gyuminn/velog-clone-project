@@ -10,6 +10,7 @@ import constant from "../lib/constant";
  *  @route POST /comment
  *  @access private
  *  @err 1. 요청 값이 잘못되었을 경우
+ *       2. 댓글을 달고자 하는 게시글이 존재하지 않을 경우
  */
 const postCommentController = async (req: Request, res: Response) => {
   try {
@@ -28,6 +29,15 @@ const postCommentController = async (req: Request, res: Response) => {
         returnCode.BAD_REQUEST,
         false,
         "요청 값이 잘못되었습니다."
+      );
+    }
+
+    if (resData === constant.VALUE_ALREADY_DELETED) {
+      return response.basicResponse(
+        res,
+        returnCode.BAD_REQUEST,
+        false,
+        "삭제된 게시물에는 댓글을 달 수 없습니다."
       );
     }
 

@@ -1,11 +1,12 @@
 import constant from "../lib/constant";
-import { Comment } from "../models";
+import { Board, Comment, User } from "../models";
 
 /**
  *  @댓글작성 댓글 작성
  *  @route POST /comment
  *  @access private
  *  @err 1. 요청 값이 잘못되었을 경우
+ *       2. 댓글을 달고자 하는 게시글이 존재하지 않을 경우
  */
 const postCommentService = async (
   userId: number,
@@ -15,8 +16,7 @@ const postCommentService = async (
   rootIndex: string,
   content: string
 ) => {
-  // 요청 값이 잘못되었을 경우
-  // parent값은 null일 수 있다.
+  // 요청 값이 잘못되었을 경우. 단, parent값은 null일 수 있다.
   if (
     !userId ||
     !articleId ||
@@ -30,15 +30,30 @@ const postCommentService = async (
     return constant.NULL_VALUE;
   }
 
-  // 만약 상위 글 번호가 null이라면
+  // 만약 parent(상위 글 번호)가 null이라면 0으로 초기화
   if (parent === null) {
     parent = "0";
   }
+
+  const parentArticle = await Board.findOne({
+    where: { board_id: articleId },
+  });
+
+  // 댓글을 달고자 하는 게시글이 존재하지 않을 경우
+  if (!parentArticle) {
+    return constant.VALUE_ALREADY_DELETED;
+  }
+
+  const commenter = await User.findOne({
+    attributes: ["email"],
+    where: { user_id: userId },
+  });
 
   // 댓글 업로드
   const createdComment = await Comment.create({
     board_id: articleId,
     user_id: userId,
+    commenter: commenter.email,
     parent,
     level,
     root_index: rootIndex,

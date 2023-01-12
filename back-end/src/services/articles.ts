@@ -1,5 +1,5 @@
 import constant from "../lib/constant";
-import { Board, Likes, Tag, User } from "../models";
+import { Board, Comment, Likes, Tag, User } from "../models";
 import { Op } from "sequelize";
 import { Sequelize } from "sequelize-typescript";
 
@@ -180,15 +180,29 @@ const getOneArticleService = async (articleId: string) => {
     where: { user_id: articleToShow.user_id },
   });
 
+  if (!userEmailToShow) {
+    return constant.NON_EXISTENT_USER;
+  }
+
   const likesCount = await Likes.count({
     where: {
       board_id: articleId,
     },
   });
 
-  if (!userEmailToShow) {
-    return constant.NON_EXISTENT_USER;
-  }
+  const attachedComments = await Comment.findAll({
+    attributes: [
+      "comment_id",
+      "commenter",
+      "parent",
+      "level",
+      "root_index",
+      "content",
+    ],
+    where: {
+      board_id: articleId,
+    },
+  });
 
   return {
     userId: userEmailToShow.email,
@@ -197,6 +211,7 @@ const getOneArticleService = async (articleId: string) => {
     // 게시글 단일 조회에서 thumbnailContent는 보여지지 않는다.
     thumbnailImageUrl: articleToShow.thumbnailImageUrl,
     likesCount,
+    attachedComments,
   };
 };
 
