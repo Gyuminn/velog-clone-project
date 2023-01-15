@@ -1,13 +1,13 @@
 import { Op } from "sequelize";
 import { Sequelize } from "sequelize-typescript";
 import constant from "../lib/constant";
-import { Board, User } from "../models";
+import { Board, Likes, User } from "../models";
 
 /**
  *  @마이페이지조회
  *  @route GET /user/myinfo
  *  @access private
- *  @err 1. 존재하지 않는 유저
+ *  @err
  */
 const getMyInfoService = async (userId: number, cursor: string | undefined) => {
   const user = await User.findOne({
@@ -37,10 +37,6 @@ const getMyInfoService = async (userId: number, cursor: string | undefined) => {
     });
   }
 
-  /**
-   * TO DO
-   * user 정보와 보여줄 아티클 정보들을 join하는 방법에 대해서도 생각해봐야 할 듯 싶다.
-   */
   // 수정 시간을 커서로 하는 페이지네이션
   const articlesToShow = await Board.findAll({
     attributes: [
@@ -116,6 +112,74 @@ const patchMyInfoService = async (
 
   return constant.SUCCESS;
 };
+
+// /**
+//  *  @좋아한포스트조회
+//  *  @route GET /user/myinfo/like
+//  *  @access private
+//  *  @err 1. 존재하지 않는 유저
+//  */
+// const getLikePostService = async (
+//   userId: number,
+//   cursor: string | undefined
+// ) => {
+//   const user = await User.findOne({
+//     attributes: ["user_id"],
+//     where: {
+//       user_id: userId,
+//     },
+//   });
+
+//   if (!user) {
+//     return constant.NON_EXISTENT_USER;
+//   }
+
+//   const limit = 5;
+//   let FIRST_CURSOR = false;
+//   if (cursor === undefined) {
+//     FIRST_CURSOR = true;
+//     cursor = await Likes.max("updatedAt", {
+//       where: {
+//         user_id: userId,
+//       },
+//     });
+//   }
+
+//   // 유저가 좋아요를 누른(수정) 시간을 커서로 하는 페이지네이션
+//   const articlesToShow = await Board.findAll({
+//     attributes: [
+//       "board_id",
+//       "title",
+//       "thumbnailContent",
+//       "thumbnailImageUrl",
+//       "createdAt",
+//       [
+//         Sequelize.literal(
+//           `(SELECT COUNT(*) FROM Likes as likes WHERE Board.board_id = likes.board_id AND isDeleted = false)`
+//         ),
+//         "likeCounts",
+//       ],
+//     ],
+//     where: {
+//       // board_id: { where: Likes.user_id: userId, },
+//       updatedAt: FIRST_CURSOR
+//         ? {
+//             [Op.lte]: cursor,
+//           }
+//         : { [Op.lt]: cursor },
+//       isDeleted: false,
+//     },
+//     order: [["updatedAt", "DESC"]],
+//     limit,
+//   });
+
+//   const nextCursor =
+//     articlesToShow.length === limit
+//       ? articlesToShow[articlesToShow.length - 1].updatedAt
+//       : null;
+
+//   return { articlesToShow, nextCursor };
+// };
 
 const userService = {
   getMyInfoService,

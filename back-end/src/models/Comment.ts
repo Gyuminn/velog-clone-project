@@ -39,10 +39,6 @@ export default class Comment extends Model {
   @Column
   public user_id!: number;
 
-  @AllowNull(false)
-  @Column
-  public commenter!: string;
-
   @Column(DataType.INTEGER)
   public parent!: number;
 

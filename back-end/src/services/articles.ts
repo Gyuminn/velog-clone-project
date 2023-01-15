@@ -123,11 +123,17 @@ const getAllArticlesService = async (cursor: string | undefined) => {
 
   const articlesToShow = await Board.findAll({
     attributes: [
-      "user_id",
+      [
+        Sequelize.literal(
+          `(SELECT nickname FROM User as user WHERE Board.user_id = user.user_id)`
+        ),
+        "writer",
+      ],
       "board_id",
       "title",
       "thumbnailContent",
       "thumbnailImageUrl",
+      "createdAt",
       [
         Sequelize.literal(
           `(SELECT COUNT(*) FROM Likes as likes WHERE Board.board_id = likes.board_id AND isDeleted = false)`
@@ -158,7 +164,6 @@ const getAllArticlesService = async (cursor: string | undefined) => {
  *  @access public
  *  @err 1. 필요한 값이 없을 경우
  *       2. 존재하지 않는 article일 경우
- *       3. 게시물 작성자가 존재하지 않는 경우
  */
 const getOneArticleService = async (articleId: string) => {
   // 필요한 값이 없을 경우
@@ -167,6 +172,24 @@ const getOneArticleService = async (articleId: string) => {
   }
 
   const articleToShow = await Board.findOne({
+    attributes: [
+      [
+        Sequelize.literal(
+          `(SELECT nickname FROM User as user WHERE Board.user_id = user.user_id)`
+        ),
+        "writer",
+      ],
+      "title",
+      "content",
+      "thumbnailImageUrl",
+      "createdAt",
+      [
+        Sequelize.literal(
+          `(SELECT COUNT(*) FROM Likes as likes WHERE Board.board_id = likes.board_id AND isDeleted = false)`
+        ),
+        "likeCounts",
+      ],
+    ],
     where: { board_id: articleId },
   });
 
@@ -175,42 +198,29 @@ const getOneArticleService = async (articleId: string) => {
     return constant.DB_NOT_FOUND;
   }
 
-  const userEmailToShow = await User.findOne({
-    attributes: ["email"],
-    where: { user_id: articleToShow.user_id },
-  });
-
-  if (!userEmailToShow) {
-    return constant.NON_EXISTENT_USER;
-  }
-
-  const likesCount = await Likes.count({
-    where: {
-      board_id: articleId,
-    },
-  });
-
   const attachedComments = await Comment.findAll({
     attributes: [
       "comment_id",
-      "commenter",
+      [
+        Sequelize.literal(
+          `(SELECT nickname FROM User as user WHERE Comment.user_id = user.user_id)`
+        ),
+        "commentor",
+      ],
       "parent",
       "level",
       "root_index",
       "content",
+      "createdAt",
     ],
     where: {
       board_id: articleId,
+      isDeleted: false,
     },
   });
 
   return {
-    userId: userEmailToShow.email,
-    title: articleToShow.title,
-    content: articleToShow.content,
-    // 게시글 단일 조회에서 thumbnailContent는 보여지지 않는다.
-    thumbnailImageUrl: articleToShow.thumbnailImageUrl,
-    likesCount,
+    articleToShow,
     attachedComments,
   };
 };
