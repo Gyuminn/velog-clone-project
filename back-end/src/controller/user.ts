@@ -43,8 +43,49 @@ const getMyInfoController = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ *  @마이페이지수정
+ *  @route PATCH /user/myinfo
+ *  @access private
+ *  @err
+ */
+const patchMyInfoController = async (req: Request, res: Response) => {
+  try {
+    const resData = await userService.patchMyInfoService(
+      req.user.user_id,
+      req.body.introSummary,
+      req.body.introContent,
+      req.body.profileImageUrl
+    );
+
+    if (resData === constant.NON_EXISTENT_USER) {
+      return response.basicResponse(
+        res,
+        returnCode.BAD_REQUEST,
+        false,
+        `존재하지 않는 유저입니다.`
+      );
+    }
+
+    return response.basicResponse(
+      res,
+      returnCode.OK,
+      true,
+      "마이페이지 수정이 완료되었습니다."
+    );
+  } catch (err) {
+    return response.basicResponse(
+      res,
+      returnCode.INTERNAL_SERVER_ERROR,
+      false,
+      `서버 오류: ${err.message}`
+    );
+  }
+};
+
 const userController = {
   getMyInfoController,
+  patchMyInfoController,
 };
 
 export default userController;

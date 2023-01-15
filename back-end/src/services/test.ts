@@ -2,7 +2,6 @@
 import sequelize, { Op } from "sequelize";
 // library
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
 
 /**
  *  @test

@@ -77,8 +77,49 @@ const getMyInfoService = async (userId: number, cursor: string | undefined) => {
   return { user, articlesToShow, nextCursor };
 };
 
+/**
+ *  @마이페이지수정
+ *  @route PATCH /user/myinfo
+ *  @access private
+ *  @err 1. 존재하지 않는 유저
+ *
+ */
+const patchMyInfoService = async (
+  userId: number,
+  introSummary: string,
+  introContent: string,
+  profileImageUrl: string
+) => {
+  const user = await User.findOne({
+    attributes: ["user_id"],
+    where: {
+      user_id: userId,
+    },
+  });
+
+  if (!user) {
+    return constant.NON_EXISTENT_USER;
+  }
+
+  await User.update(
+    {
+      introSummary,
+      introContent,
+      profileImageUrl,
+    },
+    {
+      where: {
+        user_id: userId,
+      },
+    }
+  );
+
+  return constant.SUCCESS;
+};
+
 const userService = {
   getMyInfoService,
+  patchMyInfoService,
 };
 
 export default userService;
