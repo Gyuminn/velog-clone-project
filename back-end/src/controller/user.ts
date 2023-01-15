@@ -6,7 +6,7 @@ import userService from "../services/user";
 
 /**
  *  @마이페이지조회
- *  @route GET /user/myinfo?cursor=
+ *  @route GET /user/myinfo
  *  @access private
  *  @err 1. 존재하지 않는 유저
  */
@@ -14,7 +14,7 @@ const getMyInfoController = async (req: Request, res: Response) => {
   try {
     const resData = await userService.getMyInfoService(
       req.user.user_id,
-      req.query.cursor ? String(req.query.cursor) : undefined
+      req.body.cursor ? String(req.body.cursor) : undefined
     );
 
     if (resData === constant.NON_EXISTENT_USER) {
