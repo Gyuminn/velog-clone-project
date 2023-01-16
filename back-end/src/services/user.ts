@@ -113,77 +113,78 @@ const patchMyInfoService = async (
   return constant.SUCCESS;
 };
 
-// /**
-//  *  @좋아한포스트조회
-//  *  @route GET /user/myinfo/like
-//  *  @access private
-//  *  @err 1. 존재하지 않는 유저
-//  */
-// const getLikePostService = async (
-//   userId: number,
-//   cursor: string | undefined
-// ) => {
-//   const user = await User.findOne({
-//     attributes: ["user_id"],
-//     where: {
-//       user_id: userId,
-//     },
-//   });
+/**
+ *  @좋아한포스트조회
+ *  @route GET /user/myinfo/like
+ *  @access private
+ *  @err 1. 존재하지 않는 유저
+ */
+const getLikePostService = async (
+  userId: number,
+  cursor: string | undefined
+) => {
+  const user = await User.findOne({
+    attributes: ["user_id"],
+    where: {
+      user_id: userId,
+    },
+  });
 
-//   if (!user) {
-//     return constant.NON_EXISTENT_USER;
-//   }
+  if (!user) {
+    return constant.NON_EXISTENT_USER;
+  }
 
-//   const limit = 5;
-//   let FIRST_CURSOR = false;
-//   if (cursor === undefined) {
-//     FIRST_CURSOR = true;
-//     cursor = await Likes.max("updatedAt", {
-//       where: {
-//         user_id: userId,
-//       },
-//     });
-//   }
+  const limit = 5;
+  let FIRST_CURSOR = false;
+  if (cursor === undefined) {
+    FIRST_CURSOR = true;
+    cursor = await Likes.max("updatedAt", {
+      where: {
+        user_id: userId,
+      },
+    });
+  }
 
-//   // 유저가 좋아요를 누른(수정) 시간을 커서로 하는 페이지네이션
-//   const articlesToShow = await Board.findAll({
-//     attributes: [
-//       "board_id",
-//       "title",
-//       "thumbnailContent",
-//       "thumbnailImageUrl",
-//       "createdAt",
-//       [
-//         Sequelize.literal(
-//           `(SELECT COUNT(*) FROM Likes as likes WHERE Board.board_id = likes.board_id AND isDeleted = false)`
-//         ),
-//         "likeCounts",
-//       ],
-//     ],
-//     where: {
-//       // board_id: { where: Likes.user_id: userId, },
-//       updatedAt: FIRST_CURSOR
-//         ? {
-//             [Op.lte]: cursor,
-//           }
-//         : { [Op.lt]: cursor },
-//       isDeleted: false,
-//     },
-//     order: [["updatedAt", "DESC"]],
-//     limit,
-//   });
+  const likePostArticles = await Likes.findAll({
+    attributes: ["updatedAt"],
+    include: [
+      {
+        model: Board,
+        as: "board",
+        attributes: [
+          "board_id",
+          "user_id",
+          "title",
+          "thumbnailContent",
+          "thumbnailImageUrl",
+        ],
+      },
+    ],
+    where: {
+      user_id: userId,
+      isDeleted: false,
+      updatedAt: FIRST_CURSOR
+        ? {
+            [Op.lte]: cursor,
+          }
+        : { [Op.lt]: cursor },
+    },
+    order: [["updatedAt", "DESC"]],
+    limit,
+  });
 
-//   const nextCursor =
-//     articlesToShow.length === limit
-//       ? articlesToShow[articlesToShow.length - 1].updatedAt
-//       : null;
+  const nextCursor =
+    likePostArticles.length === limit
+      ? likePostArticles[likePostArticles.length - 1].updatedAt
+      : null;
 
-//   return { articlesToShow, nextCursor };
-// };
+  return { likePostArticles, nextCursor };
+};
 
 const userService = {
   getMyInfoService,
   patchMyInfoService,
+  getLikePostService,
 };
 
 export default userService;

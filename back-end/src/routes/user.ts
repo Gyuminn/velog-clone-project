@@ -10,5 +10,6 @@ const router = express.Router();
 
 router.get("/myinfo", isLogin, userController.getMyInfoController);
 router.patch("/myinfo", isLogin, userController.patchMyInfoController);
+router.get("/myinfo/like", isLogin, userController.getLikePostController);
 
 module.exports = router;
