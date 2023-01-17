@@ -47,7 +47,7 @@ const postArticleService = async (
     // 배열로 받아온 태그를 모두 추가
     const result = await Promise.all(
       tags.map((tag) => {
-        return Tag.findOrCreate({
+        return Tag.create({
           where: {
             board_id: createdArticle.board_id,
             user_id: userId,
@@ -113,6 +113,13 @@ const patchArticleService = async (
     },
     { where: { board_id: articleId } }
   );
+
+  /**
+   * TODO
+   * 게시글 수정 시에 태그 수정을 하는 방법.
+   * 1. 모두 삭제 후 다시 생성
+   * 2. 수정한 배열에서, 기존에 있던 것이라면 냅두고, 없던 것이라면 생성하고, 기존에 있던게 없어졌다면 기존에 있던 걸 삭제.
+   */
 
   return constant.SUCCESS;
 };
@@ -239,7 +246,6 @@ const getOneArticleService = async (articleId: string) => {
     where: {
       board_id: articleId,
     },
-    raw: true,
   }).then((tags) => tags.map((tag) => tag.tagName)); // 배열로 반환하기 위함.
 
   return {
