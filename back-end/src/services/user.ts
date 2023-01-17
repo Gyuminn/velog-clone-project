@@ -114,7 +114,7 @@ const patchMyInfoService = async (
 };
 
 /**
- *  @좋아한포스트조회
+ *  @좋아한게시글조회
  *  @route GET /user/myinfo/like
  *  @access private
  *  @err 1. 존재하지 않는 유저

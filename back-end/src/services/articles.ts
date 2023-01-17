@@ -43,6 +43,21 @@ const postArticleService = async (
     thumbnailImageUrl,
   });
 
+  if (tags) {
+    // 배열로 받아온 태그를 모두 추가
+    const result = await Promise.all(
+      tags.map((tag) => {
+        return Tag.findOrCreate({
+          where: {
+            board_id: createdArticle.board_id,
+            user_id: userId,
+            tagName: tag.toLowerCase(),
+          },
+        });
+      })
+    );
+  }
+
   return { createdArticleId: createdArticle.board_id };
 };
 
