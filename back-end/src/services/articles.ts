@@ -234,9 +234,18 @@ const getOneArticleService = async (articleId: string) => {
     },
   });
 
+  const attachedTags = await Tag.findAll({
+    attributes: ["tagName"],
+    where: {
+      board_id: articleId,
+    },
+    raw: true,
+  }).then((tags) => tags.map((tag) => tag.tagName)); // 배열로 반환하기 위함.
+
   return {
     articleToShow,
     attachedComments,
+    attachedTags,
   };
 };
 
