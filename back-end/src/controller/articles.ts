@@ -146,7 +146,6 @@ const getAllArticlesController = async (req: Request, res: Response) => {
  *  @access public
  *  @err 1. 필요한 값이 없을 경우
  *       2. 존재하지 않는 article일 경우
- *       3. 게시물 작성자가 존재하지 않는 경우
  */
 const getOneArticleController = async (req: Request, res: Response) => {
   try {
@@ -169,15 +168,6 @@ const getOneArticleController = async (req: Request, res: Response) => {
         returnCode.BAD_REQUEST,
         false,
         "존재하지 않는 article 입니다."
-      );
-    }
-
-    if (resData === constant.NON_EXISTENT_USER) {
-      return response.basicResponse(
-        res,
-        returnCode.BAD_REQUEST,
-        false,
-        "게시물 작성자가 존재하지 않습니다"
       );
     }
 

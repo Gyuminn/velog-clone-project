@@ -44,16 +44,10 @@ const postCommentService = async (
     return constant.VALUE_ALREADY_DELETED;
   }
 
-  const commenter = await User.findOne({
-    attributes: ["email"],
-    where: { user_id: userId },
-  });
-
   // 댓글 업로드
   const createdComment = await Comment.create({
     board_id: articleId,
     user_id: userId,
-    commenter: commenter.email,
     parent,
     level,
     root_index: rootIndex,
