@@ -45,9 +45,9 @@ const postArticleService = async (
 
   if (tags) {
     // 배열로 받아온 태그를 모두 추가
-    const result = await Promise.all(
+    await Promise.all(
       tags.map((tag) => {
-        return Tag.create({
+        return Tag.findOrCreate({
           where: {
             board_id: createdArticle.board_id,
             user_id: userId,
@@ -114,12 +114,29 @@ const patchArticleService = async (
     { where: { board_id: articleId } }
   );
 
-  /**
-   * TODO
-   * 게시글 수정 시에 태그 수정을 하는 방법.
-   * 1. 모두 삭제 후 다시 생성
-   * 2. 수정한 배열에서, 기존에 있던 것이라면 냅두고, 없던 것이라면 생성하고, 기존에 있던게 없어졌다면 기존에 있던 걸 삭제.
-   */
+  // 태그 수정 시 기존에 존재하던 것을 모두 삭제하고 새롭게 생성하는 방법을 채택.
+  // 비교를 해서 삭제하고 갱신해주는 것보다 빠르다고 판단.
+  // 프론트엔드에서 태그 배열이 바뀌지 않았다면 보내주지 않도록 해야 자원 소모가 적어진다.
+  if (tags) {
+    // 기존에 존재하던 태그들을 삭제
+    await Tag.destroy({
+      where: {
+        board_id: articleId,
+      },
+    });
+    // 배열로 받아온 태그를 모두 추가
+    await Promise.all(
+      tags.map((tag) => {
+        return Tag.findOrCreate({
+          where: {
+            board_id: articleId,
+            user_id: userId,
+            tagName: tag.toLowerCase(),
+          },
+        });
+      })
+    );
+  }
 
   return constant.SUCCESS;
 };
